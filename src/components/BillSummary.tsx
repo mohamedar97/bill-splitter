@@ -26,8 +26,6 @@ export function BillSummary({
 }: BillSummaryProps) {
   const calculateTotal = () => {
     const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
-    const vatAmount = subtotal * (vat / 100);
-    const serviceFeeAmount = subtotal * (serviceFee / 100);
     return subtotal;
   };
 
