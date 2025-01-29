@@ -51,7 +51,7 @@ export function BillSummary({
         <CardTitle>Bill Summary</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4 h-[70vh] overflow-y-auto pr-2">
+        <div className="space-y-4 h-[40vh] overflow-y-auto pr-2">
           <div className="pt-2  space-y-2 bg-background sticky top-0">
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>VAT ({vat}%)</span>
