@@ -26,8 +26,8 @@ export default function BillSplitter() {
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const addOrderItem = (item: OrderItem) => {
-    setOrderItems([...orderItems, item]);
+  const addOrderItem = (items: OrderItem[]) => {
+    setOrderItems([...orderItems, ...items]);
     setIsOrderFormOpen(false);
   };
 

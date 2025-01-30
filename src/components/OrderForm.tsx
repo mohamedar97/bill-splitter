@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,12 +21,14 @@ interface Person {
 interface OrderFormProps {
   isOpen: boolean;
   onClose: () => void;
-  addOrderItem: (item: {
-    id: string;
-    name: string;
-    price: number;
-    assignedTo: string[];
-  }) => void;
+  addOrderItem: (
+    items: Array<{
+      id: string;
+      name: string;
+      price: number;
+      assignedTo: string[];
+    }>
+  ) => void;
   people: Person[];
 }
 
@@ -37,20 +40,55 @@ export function OrderForm({
 }: OrderFormProps) {
   const [itemPrice, setItemPrice] = useState("");
   const [assignedTo, setAssignedTo] = useState<string[]>([]);
-
+  const [orderItems, setOrderItems] = useState<
+    {
+      itemPrice: string;
+      assignedTo: string[];
+    }[]
+  >([
+    {
+      itemPrice: "",
+      assignedTo: [],
+    },
+  ]);
+  const addItemToFormState = (
+    e: React.FormEvent,
+    item: {
+      itemPrice: string;
+      assignedTo: string[];
+    }
+  ) => {
+    e.preventDefault();
+    setOrderItems([...orderItems, item]);
+    setItemPrice("");
+    setAssignedTo([]);
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalItems = [...orderItems];
+    // Add current item to orderItems if it has values
     if (itemPrice && assignedTo.length > 0) {
-      addOrderItem({
-        id: Date.now().toString(),
+      finalItems.push({ itemPrice, assignedTo });
+    }
+
+    // Convert all collected items to the format expected by addOrderItem
+    const itemsToAdd = finalItems
+      .filter((item) => item.itemPrice && item.assignedTo.length > 0)
+      .map((item) => ({
+        id: Date.now().toString() + Math.random(),
         name: `Item ${Date.now()}`,
-        price: Number.parseFloat(itemPrice),
-        assignedTo,
-      });
+        price: Number.parseFloat(item.itemPrice),
+        assignedTo: item.assignedTo,
+      }));
+
+    if (itemsToAdd.length > 0) {
+      addOrderItem(itemsToAdd);
+      // Reset the form state
+      setOrderItems([{ itemPrice: "", assignedTo: [] }]);
       setItemPrice("");
       setAssignedTo([]);
-      onClose();
     }
+    onClose();
   };
 
   const togglePerson = (id: string) => {
@@ -66,6 +104,16 @@ export function OrderForm({
           <DialogTitle>Add New Item</DialogTitle>
         </DialogHeader>
 
+        <Button
+          type="button"
+          variant="outline"
+          onClick={(e) => addItemToFormState(e, { itemPrice, assignedTo })}
+          className="w-full h-12 text-base flex items-center justify-center gap-2 hover:bg-primary/10"
+        >
+          <Plus className="w-5 h-5" />
+          Add Another Item
+        </Button>
+
         <form
           onSubmit={handleSubmit}
           className="flex-1 flex flex-col gap-4 overflow-hidden"
@@ -80,7 +128,6 @@ export function OrderForm({
                 step="0.01"
                 value={itemPrice}
                 onChange={(e) => setItemPrice(e.target.value)}
-                required
                 className="h-12 text-base"
               />
             </div>
@@ -89,6 +136,14 @@ export function OrderForm({
           <div className="flex-1 overflow-hidden">
             <Label>Assigned To</Label>
             <div className="grid grid-cols-2 gap-2 mt-2 max-h-[30vh] overflow-y-auto p-1">
+              <Button
+                type="button"
+                variant={assignedTo.includes("Shared") ? "default" : "outline"}
+                className="h-16 text-base col-span-2"
+                onClick={() => togglePerson("Shared")}
+              >
+                Shared
+              </Button>
               {people.map((person) => (
                 <Button
                   key={person.id}
@@ -102,20 +157,12 @@ export function OrderForm({
                   {person.name}
                 </Button>
               ))}
-              <Button
-                type="button"
-                variant={assignedTo.includes("Shared") ? "default" : "outline"}
-                className="h-16 text-base col-span-2"
-                onClick={() => togglePerson("Shared")}
-              >
-                Shared
-              </Button>
             </div>
           </div>
 
           <DialogFooter className="mt-4">
-            <Button type="submit" className="w-full h-12 text-base">
-              Add Item
+            <Button type="submit" className="w-full mt-2 h-12 text-base">
+              Update Order
             </Button>
           </DialogFooter>
         </form>
