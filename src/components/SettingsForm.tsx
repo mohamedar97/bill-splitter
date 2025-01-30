@@ -41,11 +41,20 @@ export function SettingsForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const finalPeople = [...people];
+    if (newPersonName.trim()) {
+      addPerson(newPersonName);
+      finalPeople.push({
+        id: (Math.random() * 100000).toString(),
+        name: newPersonName.trim(),
+      });
+    }
     updateSettings(
       Number.parseFloat(vat) || 0,
       Number.parseFloat(serviceFee) || 0,
-      people
+      finalPeople
     );
+    onClose();
   };
 
   const addPerson = (name: string) => {
@@ -117,7 +126,6 @@ export function SettingsForm({
                       addPerson(newPersonName);
                     }
                   }}
-                  onBlur={() => addPerson(newPersonName)}
                   className="h-12 text-base"
                 />
               </div>
