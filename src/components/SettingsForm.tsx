@@ -117,7 +117,7 @@ export function SettingsForm({
                   </div>
                 ))}
                 <Input
-                  placeholder="Add new person..."
+                  placeholder="Add new person"
                   value={newPersonName}
                   onChange={(e) => setNewPersonName(e.target.value)}
                   onKeyDown={(e) => {

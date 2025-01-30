@@ -125,7 +125,7 @@ export function OrderForm({
                 id="itemPrice"
                 type="number"
                 inputMode="decimal"
-                step="0.01"
+                step="1"
                 value={itemPrice}
                 onChange={(e) => setItemPrice(e.target.value)}
                 className="h-12 text-base"
