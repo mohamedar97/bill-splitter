@@ -24,14 +24,11 @@ export function BillSummary({
   serviceFee,
   people,
 }: BillSummaryProps) {
-  const calculateTotal = (withoutVatAndServiceFee: boolean = false) => {
-    const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
-    const vatAmount = subtotal * (vat / 100);
-    const serviceFeeAmount = subtotal * (serviceFee / 100);
-    return withoutVatAndServiceFee
-      ? subtotal
-      : subtotal + vatAmount + serviceFeeAmount;
-  };
+  // Calculate all values once
+  const subtotal = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const serviceFeeAmount = subtotal * (serviceFee / 100);
+  const vatAmount = (subtotal + serviceFeeAmount) * (vat / 100);
+  const finalTotal = subtotal + serviceFeeAmount + vatAmount;
 
   const calculatePersonTotal = (personId: string) => {
     const personItems = orderItems.filter(
@@ -44,8 +41,8 @@ export function BillSummary({
         : item.price / item.assignedTo.length;
       return sum + itemCost;
     }, 0);
-    const personVat = personSubtotal * (vat / 100);
     const personServiceFee = personSubtotal * (serviceFee / 100);
+    const personVat = (personSubtotal + personServiceFee) * (vat / 100);
     return personSubtotal + personVat + personServiceFee;
   };
 
@@ -59,17 +56,15 @@ export function BillSummary({
           <div className="pt-2  space-y-2 bg-background sticky top-0">
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Total</span>
-              <span>EGP {calculateTotal(true).toFixed(2)}</span>
+              <span>EGP {subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>VAT ({vat}%)</span>
-              <span>EGP {(calculateTotal(true) * (vat / 100)).toFixed(2)}</span>
+              <span>EGP {vatAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center text-sm text-muted-foreground">
               <span>Service Fee ({serviceFee}%)</span>
-              <span>
-                EGP {(calculateTotal(true) * (serviceFee / 100)).toFixed(2)}
-              </span>
+              <span>EGP {serviceFeeAmount.toFixed(2)}</span>
             </div>
           </div>
 
@@ -90,7 +85,7 @@ export function BillSummary({
           <div className="pt-2 border-t bg-background sticky bottom-0">
             <div className="flex justify-between font-bold">
               <span>Final Total</span>
-              <span>EGP {calculateTotal().toFixed(2)}</span>
+              <span>EGP {finalTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>
