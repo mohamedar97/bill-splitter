@@ -26,7 +26,7 @@ A modern web application built with Next.js that helps groups split bills fairly
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/mohamedar97/bill-splitter
 cd bill-splitter
 ```
 
