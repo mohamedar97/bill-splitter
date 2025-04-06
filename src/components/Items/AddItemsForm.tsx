@@ -141,10 +141,7 @@ export function AddItemsForm() {
       const compressedFile = await compressImage(files[0]);
 
       // Upload the compressed file using uploadthing
-      const startTime = Date.now();
       await startUpload([compressedFile]);
-      const executionTime = Date.now() - startTime;
-      console.log(`handleFileUpload execution time: ${executionTime / 1000}s`);
 
       // The rest is handled in onClientUploadComplete callback
     } catch (error) {
