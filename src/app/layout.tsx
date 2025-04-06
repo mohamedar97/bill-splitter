@@ -7,7 +7,7 @@ import { BillSplitterProvider } from "@/contexts/bill-splitter-context";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bill Splitter",
+  title: "Split-ny",
   description: "Split bills easily among friends",
 };
 

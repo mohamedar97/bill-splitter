@@ -54,6 +54,9 @@ export function AddItemsForm({
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
+  const [activeTab, setActiveTab] = useState<string>(
+    isLoggedIn && isEmailApproved ? "receipt" : "manual"
+  );
 
   // Setup uploadthing
   const { startUpload, isUploading } = useUploadThing("imageUploader", {
@@ -90,10 +93,6 @@ export function AddItemsForm({
       setIsProcessing(false);
     },
   });
-
-  const [activeTab, setActiveTab] = useState<string>(
-    isLoggedIn && isEmailApproved ? "receipt" : "manual"
-  );
 
   const togglePerson = (person: string) => {
     if (selectedPeople.includes(person)) {

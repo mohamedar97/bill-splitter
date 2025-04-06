@@ -100,6 +100,9 @@ export function ItemConfirmationDialog({
                 onChange={(e) => setItemPrice(e.target.value)}
                 className="mt-1"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Verify the amount is accurate before confirming.
+              </p>
             </div>
           </div>
 

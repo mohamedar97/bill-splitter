@@ -17,6 +17,7 @@ import { useBillSplitter } from "@/contexts/bill-splitter-context";
 import { SummaryOverview } from "./SummaryOverview";
 import { PerPersonSummary } from "./PerPersonSummary";
 import { PersonSummary } from "./types";
+import Link from "next/link";
 
 export function SummaryContent() {
   const router = useRouter();
@@ -127,23 +128,31 @@ export function SummaryContent() {
       {/* Fixed position button at bottom */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
         <div className="container max-w-md mx-auto">
-          <Button
-            disabled={isLoading}
-            onClick={handleResetAndStartNew}
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              <>
-                <Home className="h-4 w-4 mr-2" />
-                Start New Bill
-              </>
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Link href="/items" className="flex-1">
+              <Button variant="outline" className="w-full">
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Calculations Wrong?
+              </Button>
+            </Link>
+            <Button
+              disabled={isLoading}
+              onClick={handleResetAndStartNew}
+              className="flex-1"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <Home className="h-4 w-4 mr-2" />
+                  Start New Bill
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </main>
