@@ -11,7 +11,8 @@ export function ReceiptScanner({
   isProcessing,
   onFileUpload,
 }: ReceiptScannerProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const cameraFileInputRef = useRef<HTMLInputElement>(null);
   const [loadingStep, setLoadingStep] = useState(0);
   const loadingMessages = [
     "Deciphering chicken scratch handwriting on receipt...",
@@ -53,12 +54,6 @@ export function ReceiptScanner({
     }
   }, [isProcessing]);
 
-  const handleTakePhoto = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
       <h3 className="font-medium">Upload or Take a Photo of Receipt</h3>
@@ -69,7 +64,7 @@ export function ReceiptScanner({
 
       <div className="grid grid-cols-2 gap-4">
         <Button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => galleryFileInputRef.current?.click()}
           disabled={isProcessing}
           className="h-24 flex flex-col items-center justify-center"
         >
@@ -78,7 +73,7 @@ export function ReceiptScanner({
         </Button>
 
         <Button
-          onClick={handleTakePhoto}
+          onClick={() => cameraFileInputRef.current?.click()}
           disabled={isProcessing}
           className="h-24 flex flex-col items-center justify-center"
         >
@@ -88,11 +83,19 @@ export function ReceiptScanner({
 
         <input
           type="file"
-          ref={fileInputRef}
+          ref={galleryFileInputRef}
           accept="image/*"
           onChange={onFileUpload}
           className="hidden"
-          capture={undefined}
+          capture={undefined} // Means open gallery
+        />
+        <input
+          type="file"
+          ref={cameraFileInputRef}
+          accept="image/*"
+          onChange={onFileUpload}
+          className="hidden"
+          capture="environment" // Means open camera
         />
       </div>
 

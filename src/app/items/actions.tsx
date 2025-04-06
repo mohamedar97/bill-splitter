@@ -7,7 +7,7 @@ import { z } from "zod";
 export async function processReceipt(url: string) {
   try {
     const result = await generateObject({
-      model: openai("gpt-4o-mini"),
+      model: openai("gpt-4o"),
       schema: z.object({
         items: z.array(
           z.object({
@@ -22,6 +22,7 @@ export async function processReceipt(url: string) {
             
             Please analyze the receipt and extract all items with their prices.
             Format your response as a JSON array of objects with 'name' and 'price' properties.
+            If a certain item has more than one piece, please split it into multiple items.
             
             For example:
             [

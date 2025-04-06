@@ -212,7 +212,7 @@ export function AddItemsForm() {
               resolve(compressedFile);
             },
             "image/jpeg",
-            0.7 // Compression quality (0-1)
+            0.95 // Compression quality (0-1)
           );
         };
 
