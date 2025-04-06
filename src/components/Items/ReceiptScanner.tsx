@@ -92,7 +92,7 @@ export function ReceiptScanner({
           accept="image/*"
           onChange={onFileUpload}
           className="hidden"
-          capture="environment"
+          capture={undefined}
         />
       </div>
 

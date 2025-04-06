@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Home } from "lucide-react";
+import { ChevronLeft, Home, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import { PersonSummary } from "./types";
 
 export function SummaryContent() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const { people, vat, serviceCharge, items, calculateTotal, resetAll } =
     useBillSplitter();
   const [personSummaries, setPersonSummaries] = useState<
@@ -73,6 +74,7 @@ export function SummaryContent() {
   }, [people, items, vat, serviceCharge, calculateTotal, router]);
 
   const handleResetAndStartNew = () => {
+    setIsLoading(true);
     resetAll();
     router.push("/");
   };
@@ -126,8 +128,17 @@ export function SummaryContent() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
         <div className="container max-w-md mx-auto">
           <Button onClick={handleResetAndStartNew} className="w-full">
-            <Home className="h-4 w-4 mr-2" />
-            Start New Bill
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <Home className="h-4 w-4 mr-2" />
+                Start New Bill
+              </>
+            )}
           </Button>
         </div>
       </div>

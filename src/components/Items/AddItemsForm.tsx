@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -28,11 +28,12 @@ import {
   ItemConfirmationDialog,
   type ExtractedItem,
 } from "./";
+import Link from "next/link";
 
 export function AddItemsForm() {
-  const router = useRouter();
   const { people, items, addItem, updateItem, removeItem } = useBillSplitter();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
@@ -83,10 +84,6 @@ export function AddItemsForm() {
   const cancelEdit = () => {
     setEditingItemId(null);
     setSelectedPeople([]);
-  };
-
-  const viewSummary = () => {
-    router.push("/summary");
   };
 
   // Receipt processing functions
@@ -256,13 +253,22 @@ export function AddItemsForm() {
       {/* Fixed position button at bottom */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
         <div className="container max-w-md mx-auto">
-          <Button
-            onClick={viewSummary}
-            className="w-full"
-            disabled={items.length === 0}
-          >
-            View Summary
-          </Button>
+          <Link href="/summary">
+            <Button
+              onClick={() => setIsLoading(true)}
+              className="w-full"
+              disabled={items.length === 0}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "View Summary"
+              )}
+            </Button>
+          </Link>
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +13,12 @@ import {
 import { useBillSplitter } from "@/contexts/bill-splitter-context";
 import { PeopleInput } from "./PeopleInput";
 import { BillSettings } from "./BillSettings";
+import Link from "next/link";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export function HomeContent() {
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const {
     people,
     vat,
@@ -26,13 +28,6 @@ export function HomeContent() {
     updateVat,
     updateServiceCharge,
   } = useBillSplitter();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (people.length > 0) {
-      router.push("/items");
-    }
-  };
 
   return (
     <main className="container max-w-md mx-auto p-4 pb-24">
@@ -64,14 +59,23 @@ export function HomeContent() {
       {/* Fixed position button at bottom */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
         <div className="container max-w-md mx-auto">
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            className="w-full"
-            disabled={people.length === 0}
-          >
-            Continue to Add Items
-          </Button>
+          <Link href="/items">
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => setLoading(true)}
+              disabled={people.length === 0 || loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Continue to Add Items"
+              )}
+            </Button>
+          </Link>
         </div>
       </div>
     </main>
