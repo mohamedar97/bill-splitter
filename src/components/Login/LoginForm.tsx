@@ -57,14 +57,12 @@ export default function LoginForm() {
         password: values.password,
         rememberMe: values.rememberMe,
       });
-      console.log(data, error);
       if (error) {
         toast.error(error.message);
         setIsLoading(false);
         return;
       }
 
-      router.replace("/");
       router.refresh();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -185,12 +183,6 @@ export default function LoginForm() {
             </svg>
             Login with Google
           </Button> */}
-        </div>
-        <div className="text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href={`/register`} className="underline underline-offset-4">
-            Sign up
-          </Link>
         </div>
       </form>
     </Form>

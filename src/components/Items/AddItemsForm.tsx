@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { generateReactHelpers } from "@uploadthing/react";
 
@@ -35,7 +35,13 @@ import Link from "next/link";
 // Generate the uploadthing helpers
 const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
-export function AddItemsForm() {
+export function AddItemsForm({
+  isEmailApproved,
+  isLoggedIn,
+}: {
+  isEmailApproved: boolean;
+  isLoggedIn: boolean;
+}) {
   const { people, items, addItem, updateItem, removeItem } = useBillSplitter();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -84,6 +90,10 @@ export function AddItemsForm() {
       setIsProcessing(false);
     },
   });
+
+  const [activeTab, setActiveTab] = useState<string>(
+    isLoggedIn && isEmailApproved ? "receipt" : "manual"
+  );
 
   const togglePerson = (person: string) => {
     if (selectedPeople.includes(person)) {
@@ -308,7 +318,11 @@ export function AddItemsForm() {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <Tabs defaultValue="receipt" className="w-full">
+            <Tabs
+              className="w-full"
+              onValueChange={setActiveTab}
+              value={activeTab}
+            >
               <TabsList className="grid grid-cols-2 mb-4">
                 <TabsTrigger value="receipt">Scan Receipt</TabsTrigger>
 
@@ -317,6 +331,8 @@ export function AddItemsForm() {
 
               <TabsContent value="receipt" className="space-y-4">
                 <ReceiptScanner
+                  isEmailApproved={isEmailApproved}
+                  isLoggedIn={isLoggedIn}
                   isProcessing={isProcessing}
                   onFileUpload={handleFileUpload}
                 />
@@ -339,7 +355,20 @@ export function AddItemsForm() {
 
             {/* Added Items List */}
             <div className="space-y-4">
-              <h3 className="font-medium">Added Items</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Added Items</h3>
+                {activeTab === "receipt" && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setActiveTab("manual")}
+                    className="h-8 w-8"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               <ItemList
                 items={items}
                 onEditItem={editItem}

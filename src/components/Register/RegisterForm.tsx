@@ -81,7 +81,7 @@ export default function RegisterForm() {
       }
       toast.success("Account created!");
 
-      router.replace("/");
+      router.refresh();
     } catch (error) {
       toast.error(
         "Something went wrong with authentication. Please try again."
@@ -187,12 +187,6 @@ export default function RegisterForm() {
               "Create account"
             )}
           </Button>
-        </div>
-        <div className="text-center text-sm">
-          Already have an account?{" "}
-          <a href="/login" className="underline underline-offset-4">
-            Sign in
-          </a>
         </div>
       </form>
     </Form>

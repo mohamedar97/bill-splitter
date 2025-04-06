@@ -1,4 +1,8 @@
+import { auth } from "@/lib/auth";
+import { getApprovalStatus } from "@/server/actions/getApprovalStatus";
+import { headers } from "next/headers";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { UploadThingError } from "uploadthing/server";
 
 const f = createUploadthing();
 
@@ -17,6 +21,15 @@ export const ourFileRouter = {
   })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
+      const session = await auth.api.getSession({
+        headers: await headers(), // you need to pass the headers object.
+      });
+      const isEmailApproved = session
+        ? await getApprovalStatus(session.user.id)
+        : false;
+      if (!session && !isEmailApproved)
+        throw new UploadThingError("Unauthorized");
+
       return {};
     })
     .onUploadComplete(async ({ metadata, file }) => {

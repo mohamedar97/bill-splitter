@@ -1,13 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Camera, Upload } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import LoginForm from "@/components/Login/LoginForm";
+import RegisterForm from "@/components/Register/RegisterForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ReceiptScannerProps {
+  isEmailApproved: boolean;
+  isLoggedIn: boolean;
   isProcessing: boolean;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
 
 export function ReceiptScanner({
+  isEmailApproved,
+  isLoggedIn,
   isProcessing,
   onFileUpload,
 }: ReceiptScannerProps) {
@@ -53,6 +60,41 @@ export function ReceiptScanner({
       };
     }
   }, [isProcessing]);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+        <h3 className="font-medium text-center">Login Required</h3>
+        <p className="text-sm text-muted-foreground text-center mb-4">
+          Receipt scanning is only available for logged-in users.
+        </p>
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Register</TabsTrigger>
+          </TabsList>
+          <TabsContent value="login">
+            <LoginForm />
+          </TabsContent>
+          <TabsContent value="register">
+            <RegisterForm />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
+
+  if (!isEmailApproved) {
+    return (
+      <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+        <h3 className="font-medium text-center">Email Approval Pending</h3>
+        <p className="text-sm text-muted-foreground text-center">
+          Your email is pending approval. Receipt scanning will be available
+          once your email is approved.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-muted/30">

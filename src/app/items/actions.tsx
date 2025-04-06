@@ -1,10 +1,24 @@
 "use server";
-import { put } from "@vercel/blob";
 import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
-
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getApprovalStatus } from "@/server/actions/getApprovalStatus";
 export async function processReceipt(url: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+  const isEmailApproved = session
+    ? await getApprovalStatus(session.user.id)
+    : false;
+
+  if (!isEmailApproved || !session) {
+    throw new Error(
+      "You must be logged in and have your email approved to process receipts."
+    );
+  }
+
   try {
     const result = await generateObject({
       model: openai("gpt-4o"),
