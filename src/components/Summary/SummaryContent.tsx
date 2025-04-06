@@ -127,7 +127,11 @@ export function SummaryContent() {
       {/* Fixed position button at bottom */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t">
         <div className="container max-w-md mx-auto">
-          <Button onClick={handleResetAndStartNew} className="w-full">
+          <Button
+            disabled={isLoading}
+            onClick={handleResetAndStartNew}
+            className="w-full"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
