@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { generateReactHelpers } from "@uploadthing/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import {
   useBillSplitter,
   type BillItem,
 } from "@/contexts/bill-splitter-context";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 import {
   ItemForm,
@@ -29,6 +31,9 @@ import {
   type ExtractedItem,
 } from "./";
 import Link from "next/link";
+
+// Generate the uploadthing helpers
+const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 export function AddItemsForm() {
   const { people, items, addItem, updateItem, removeItem } = useBillSplitter();
@@ -43,6 +48,42 @@ export function AddItemsForm() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false);
+
+  // Setup uploadthing
+  const { startUpload, isUploading } = useUploadThing("imageUploader", {
+    onClientUploadComplete: async (res) => {
+      if (res && res.length > 0) {
+        try {
+          // Call the server action to process the receipt
+          const processedReceipt = await processReceipt(res[0].ufsUrl);
+
+          if (processedReceipt.error || !processedReceipt.extractedItems) {
+            toast.error(processedReceipt.error || "Failed to process receipt");
+            return;
+          }
+
+          setExtractedItems(
+            processedReceipt.extractedItems.map((item) => ({
+              ...item,
+              confirmed: false,
+            }))
+          );
+          setCurrentItemIndex(0);
+          setIsConfirmationDialogOpen(true);
+        } catch (error) {
+          toast.error(
+            `Failed to process receipt: Please try again or add items manually.`
+          );
+        } finally {
+          setIsProcessing(false);
+        }
+      }
+    },
+    onUploadError: (error) => {
+      toast.error(`Error uploading: ${error.message}`);
+      setIsProcessing(false);
+    },
+  });
 
   const togglePerson = (person: string) => {
     if (selectedPeople.includes(person)) {
@@ -90,45 +131,108 @@ export function AddItemsForm() {
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     try {
       setIsProcessing(true);
 
-      // Create a FormData object to send the file
-      const formData = new FormData();
-      formData.append("receipt", file);
+      // Compress image before uploading
+      const compressedFile = await compressImage(files[0]);
 
-      // Call the server action to process the receipt
-      const processedReceipt = await processReceipt(formData);
+      // Upload the compressed file using uploadthing
+      const startTime = Date.now();
+      await startUpload([compressedFile]);
+      const executionTime = Date.now() - startTime;
+      console.log(`handleFileUpload execution time: ${executionTime / 1000}s`);
 
-      if (processedReceipt.error || !processedReceipt.extractedItems) {
-        toast.error(processedReceipt.error || "Failed to process receipt");
-        return;
-      }
-
-      setExtractedItems(
-        processedReceipt.extractedItems.map((item) => ({
-          ...item,
-          confirmed: false,
-        }))
-      );
-      setCurrentItemIndex(0);
-      setIsConfirmationDialogOpen(true);
+      // The rest is handled in onClientUploadComplete callback
     } catch (error) {
       toast.error(
-        `Failed to process receipt: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }. Please try again or add items manually.`
+        `Failed to upload receipt: Please try again or add items manually.`
       );
-    } finally {
       setIsProcessing(false);
+    } finally {
       // Reset file input
       if (event.target) {
         event.target.value = "";
       }
     }
+  };
+
+  // Function to compress image before upload
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (readerEvent) => {
+        const image = new Image();
+        image.onload = () => {
+          // Create canvas
+          const canvas = document.createElement("canvas");
+
+          // Calculate new dimensions while maintaining aspect ratio
+          let width = image.width;
+          let height = image.height;
+          const maxDimension = 1200; // Maximum dimension for either width or height
+
+          if (width > height && width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          // Draw resized image to canvas
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Could not get canvas context"));
+            return;
+          }
+
+          ctx.drawImage(image, 0, 0, width, height);
+
+          // Convert to blob with reduced quality
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error("Could not create blob"));
+                return;
+              }
+
+              // Create new file from blob
+              const compressedFile = new File([blob], file.name, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+
+              resolve(compressedFile);
+            },
+            "image/jpeg",
+            0.7 // Compression quality (0-1)
+          );
+        };
+
+        image.onerror = () => {
+          reject(new Error("Failed to load image"));
+        };
+
+        if (typeof readerEvent.target?.result === "string") {
+          image.src = readerEvent.target.result;
+        } else {
+          reject(new Error("Failed to read file"));
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Failed to read file"));
+      };
+
+      reader.readAsDataURL(file);
+    });
   };
 
   const confirmCurrentItem = () => {

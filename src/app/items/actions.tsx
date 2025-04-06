@@ -4,32 +4,10 @@ import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 
-export async function processReceipt(formData: FormData) {
+export async function processReceipt(url: string) {
   try {
-    // Check if receipt file exists
-    const receiptFile = formData.get("receipt") as File;
-    if (!receiptFile) {
-      throw new Error("No receipt file provided");
-    }
-
-    // Upload to blob storage
-    let url;
-    try {
-      const result = await put(receiptFile.name, receiptFile, {
-        access: "public",
-      });
-      url = result.url;
-    } catch (error) {
-      throw new Error(
-        `Failed to upload receipt image: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-
-    // Process with AI
     const result = await generateObject({
-      model: openai("gpt-4o"),
+      model: openai("gpt-4o-mini"),
       schema: z.object({
         items: z.array(
           z.object({
@@ -68,7 +46,6 @@ export async function processReceipt(formData: FormData) {
         },
       ],
     });
-
     if (!result.object?.items || !Array.isArray(result.object.items)) {
       throw new Error("Failed to extract items from receipt");
     }
