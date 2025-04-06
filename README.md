@@ -5,6 +5,7 @@ A modern web application built with Next.js that helps groups split bills fairly
 ## Features
 
 - Add individual or multiple items to the bill
+- **Scan receipts with AI** to automatically extract items
 - Assign items to specific people or mark them as shared
 - Automatically calculate VAT and service fees
 - Customize VAT percentage and service fee rates
@@ -12,14 +13,18 @@ A modern web application built with Next.js that helps groups split bills fairly
 - Real-time calculation of individual shares
 - Responsive design that works on both desktop and mobile
 - Automatic split of shared items among all participants
+- Proportional distribution of service charges and VAT based on individual spend
 
 ## Tech Stack
 
-- [Next.js 15](https://nextjs.org/) - React framework
-- [React](https://reactjs.org/) - UI library
+- [Next.js 15.1](https://nextjs.org/) - React framework
+- [React 19](https://reactjs.org/) - UI library
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 - [Lucide Icons](https://lucide.dev/) - Beautiful icons
+- [Radix UI](https://www.radix-ui.com/) - Accessible UI components
+- [AI Integration](https://ai.vercel.ai/) - For receipt scanning capabilities
+- [Zod](https://zod.dev/) - TypeScript-first schema validation
 
 ## Getting Started
 
@@ -62,15 +67,22 @@ yarn dev
 
 2. Use the "Add Item" button to:
 
-   - Enter item prices
+   - Enter item prices and names
    - Assign items to specific people
    - Mark items as shared between all participants
 
-3. View the bill summary to see:
+3. Use the "Scan Receipt" feature to:
+
+   - Upload a photo of your receipt
+   - Automatically extract items with AI
+   - Review and assign items to people
+
+4. View the bill summary to see:
    - Subtotal
    - VAT amount
    - Service fee amount
    - Individual shares for each person
+   - Detailed breakdown per person
    - Final total
 
 ## Contributing
