@@ -1,6 +1,6 @@
 "use server";
 import { generateObject } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -21,7 +21,7 @@ export async function processReceipt(url: string) {
 
   try {
     const result = await generateObject({
-      model: openai("gpt-4o"),
+      model: google("gemini-2.5-flash-preview-04-17"),
       schema: z.object({
         items: z.array(
           z.object({
