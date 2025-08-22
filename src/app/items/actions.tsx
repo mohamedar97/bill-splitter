@@ -21,7 +21,7 @@ export async function processReceipt(url: string) {
 
   try {
     const result = await generateObject({
-      model: google("gemini-2.5-flash-preview-04-17"),
+      model: google("gemini-2.5-flash"),
       schema: z.object({
         items: z.array(
           z.object({
